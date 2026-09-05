@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>160 gaj house — Moh. Than Singh, Pilibhit</title>
+<style>
+  :root{
+    --navy-900:#070f21; --navy-800:#0c1730; --navy-700:#132241; --navy-600:#1d3157;
+    --line:#2a4470; --ink:#e8eefc; --ink-dim:#8ea3c9;
+    --brick:#c8613a; --brick-soft:#e08a5f; --water:#3fa9a0; --marker:#e8b93b;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;height:100%;overflow:hidden;background:var(--navy-900);
+    font-family:"Inter","Segoe UI",system-ui,-apple-system,sans-serif;color:var(--ink)}
+  #app{position:fixed;inset:0}
+  canvas{display:block;touch-action:none}
+  #top{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;align-items:center;gap:9px;
+    padding:9px 12px;background:linear-gradient(180deg,rgba(7,15,33,.96),rgba(7,15,33,.7) 70%,transparent);
+    pointer-events:none}
+  #top>*{pointer-events:auto}
+  .brand{font-size:13px;font-weight:600;line-height:1.25}
+  .brand span{display:block;font-size:10.5px;font-weight:400;color:var(--ink-dim);
+    font-variant-numeric:tabular-nums}
+  .spacer{flex:1}
+  .iconbtn{background:var(--navy-700);border:1px solid var(--line);color:var(--ink);
+    width:34px;height:34px;border-radius:9px;font-size:15px;cursor:pointer;display:grid;place-items:center}
+  .iconbtn:hover{background:var(--navy-600)}
+  .iconbtn.on{background:var(--brick);border-color:var(--brick);color:#fff}
+  .iconbtn:focus-visible,.vbtn:focus-visible,.fbtn:focus-visible{outline:2px solid var(--marker);outline-offset:2px}
+  #rail{position:fixed;z-index:20;left:12px;top:58px;display:flex;flex-direction:column;gap:6px;width:196px}
+  .vbtn{display:flex;gap:9px;align-items:flex-start;text-align:left;width:100%;
+    background:rgba(12,23,48,.86);border:1px solid var(--line);border-left:3px solid transparent;
+    color:var(--ink);padding:8px 10px;border-radius:8px;cursor:pointer;font:inherit;backdrop-filter:blur(6px)}
+  .vbtn:hover{background:rgba(29,49,87,.9)}
+  .vbtn.on{border-left-color:var(--brick);background:rgba(29,49,87,.95)}
+  .vbtn b{display:block;font-size:12.5px;font-weight:600}
+  .vbtn small{display:block;font-size:10.5px;color:var(--ink-dim);margin-top:1px;line-height:1.3}
+  .vnum{font-size:10px;color:var(--ink-dim);font-variant-numeric:tabular-nums;padding-top:2px;min-width:11px}
+  .vbtn.on .vnum{color:var(--brick-soft)}
+  #ruler{position:fixed;z-index:15;right:12px;top:58px;width:142px;
+    background:rgba(12,23,48,.86);border:1px solid var(--line);border-radius:8px;padding:9px 10px;
+    backdrop-filter:blur(6px)}
+  #ruler h4{margin:0 0 7px;font-size:10.5px;font-weight:600;color:var(--ink-dim)}
+  .lvl{display:flex;align-items:center;gap:7px;font-size:10.5px;padding:2.5px 0;
+    font-variant-numeric:tabular-nums;line-height:1.25}
+  .lvl i{width:7px;height:7px;border-radius:2px;flex:none;font-style:normal}
+  .lvl u{text-decoration:none;color:var(--ink-dim);margin-left:auto;font-size:10px}
+  #info{position:fixed;z-index:15;left:12px;bottom:12px;max-width:min(452px,calc(100vw - 24px));
+    background:rgba(12,23,48,.9);border:1px solid var(--line);border-radius:10px;padding:11px 13px;
+    backdrop-filter:blur(8px)}
+  #info h3{margin:0 0 5px;font-size:13px;font-weight:600}
+  #info p{margin:0;font-size:11.5px;line-height:1.5;color:#c3d2ee}
+  #povhud{position:fixed;inset:0;z-index:18;display:none;pointer-events:none}
+  #povhud.on{display:block}
+  #stick{position:absolute;left:22px;bottom:26px;width:118px;height:118px;border-radius:50%;
+    background:rgba(12,23,48,.5);border:1px solid var(--line);pointer-events:auto;touch-action:none}
+  #knob{position:absolute;left:50%;top:50%;width:46px;height:46px;margin:-23px 0 0 -23px;
+    border-radius:50%;background:var(--brick);opacity:.85}
+  #povtip{position:absolute;left:50%;bottom:24px;transform:translateX(-50%);font-size:11px;
+    color:var(--ink-dim);background:rgba(12,23,48,.85);padding:6px 12px;border-radius:20px;
+    border:1px solid var(--line);white-space:nowrap}
+  #flrbtns{position:absolute;right:14px;bottom:26px;display:flex;flex-direction:column;gap:7px;pointer-events:auto}
+  .fbtn{background:rgba(12,23,48,.9);border:1px solid var(--line);color:var(--ink);
+    padding:9px 13px;border-radius:9px;font:inherit;font-size:12px;cursor:pointer}
+  .fbtn.on{background:var(--brick);border-color:var(--brick);color:#fff}
+  #sheet{position:fixed;z-index:40;inset:0;background:rgba(4,9,20,.75);display:none;
+    align-items:center;justify-content:center;padding:16px;overflow:auto}
+  #sheet.on{display:flex}
+  .card{background:var(--navy-800);border:1px solid var(--line);border-radius:14px;
+    max-width:680px;width:100%;padding:20px 22px;max-height:88vh;overflow:auto}
+  .card h2{margin:0 0 3px;font-size:17px;font-weight:600}
+  .card .sub{color:var(--ink-dim);font-size:11.5px;margin:0 0 15px;font-variant-numeric:tabular-nums}
+  table{width:100%;border-collapse:collapse;font-size:12px;font-variant-numeric:tabular-nums}
+  th{text-align:left;font-weight:600;color:var(--ink-dim);font-size:10.5px;padding:0 0 6px;
+    border-bottom:1px solid var(--line)}
+  td{padding:6px 0;border-bottom:1px solid rgba(42,68,112,.4);vertical-align:top;line-height:1.4}
+  td:last-child,th:last-child{text-align:right;white-space:nowrap;padding-left:10px}
+  td:nth-child(2){color:var(--ink-dim);padding-left:12px;white-space:nowrap}
+  tr.tot td{border-bottom:none;font-weight:600;padding-top:9px;color:var(--brick-soft)}
+  tr.phase td{padding-top:15px;color:var(--ink-dim);font-size:10.5px;border-bottom:1px solid var(--line)}
+  .note{margin-top:15px;font-size:11.5px;line-height:1.6;color:#c3d2ee}
+  .note b{color:var(--marker);font-weight:600}
+  .close{float:right;background:none;border:0;color:var(--ink-dim);font-size:22px;cursor:pointer;
+    line-height:1;padding:0 2px}
+  #loading{position:fixed;inset:0;z-index:60;display:grid;place-items:center;
+    background:var(--navy-900);font-size:12.5px;color:var(--ink-dim);padding:24px;text-align:center}
+  @media (max-width:760px){
+    #rail{left:8px;right:8px;top:50px;width:auto;flex-direction:row;overflow-x:auto;gap:5px;padding-bottom:3px}
+    .vbtn{width:auto;flex:none;padding:6px 9px;border-left:0;border-bottom:3px solid transparent}
+    .vbtn.on{border-left:1px solid var(--line);border-bottom-color:var(--brick)}
+    .vbtn small,.vnum{display:none}
+    #ruler{display:none}
+    #info{left:8px;right:8px;bottom:8px;max-width:none;padding:9px 11px}
+    #info p{font-size:11px}
+    .brand span{display:none}
+    #stick{width:96px;height:96px;left:14px;bottom:76px}
+    #knob{width:38px;height:38px;margin:-19px 0 0 -19px}
+    #flrbtns{bottom:76px;right:10px}
+    #povtip{bottom:16px;font-size:10px}
+  }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="top">
+  <div class="brand">160 gaj house — Moh. Than Singh, Pilibhit
+    <span>38'-3" x 37'-6" · east facing · nala south · G+1 built, G+2 framed</span></div>
+  <div class="spacer"></div>
+  <button class="iconbtn" id="btnRain" title="Monsoon water level" aria-label="Monsoon water">&#9730;</button>
+  <button class="iconbtn" id="btnCost" title="Costing and phasing" aria-label="Costing">&#8377;</button>
+  <button class="iconbtn" id="btnHome" title="Reset camera" aria-label="Reset camera">&#8634;</button>
+</div>
+<div id="rail"></div>
+<div id="ruler">
+  <h4>Levels, from plot surface</h4>
+  <div class="lvl"><i style="background:#7f8aa3"></i>Plot today<u>0'-0"</u></div>
+  <div class="lvl"><i style="background:#5b6b8a"></i>Footing base<u>&minus;4'-6"</u></div>
+  <div class="lvl"><i style="background:var(--water)"></i>Flood line<u>+7'-0"</u></div>
+  <div class="lvl"><i style="background:#9aa7bd"></i>Road<u>+7'-0"</u></div>
+  <div class="lvl"><i style="background:var(--brick)"></i>Plinth, floor<u>+8'-6"</u></div>
+  <div class="lvl"><i style="background:#c9d4ea"></i>Lintel + chajja<u>+15'-9"</u></div>
+  <div class="lvl"><i style="background:#c9d4ea"></i>First floor<u>+19'-0"</u></div>
+  <div class="lvl"><i style="background:#c9d4ea"></i>Roof slab<u>+29'-6"</u></div>
+</div>
+<div id="info"><h3 id="infoTitle"></h3><p id="infoBody"></p></div>
+<div id="povhud">
+  <div id="stick"><div id="knob"></div></div>
+  <div id="flrbtns">
+    <button class="fbtn" data-h="8.5">Ground</button>
+    <button class="fbtn" data-h="19">First</button>
+    <button class="fbtn" data-h="29.5">Roof</button>
+  </div>
+  <div id="povtip">Drag to look &nbsp;·&nbsp; joystick or W A S D to walk</div>
+</div>
+<div id="sheet">
+  <div class="card">
+    <button class="close" id="closeSheet" aria-label="Close">&times;</button>
+    <h2>Where the money goes</h2>
+    <p class="sub">Pilibhit rates, September 2026 · 997 sq ft per floor · full detail in the Excel tracker</p>
+    <table>
+      <tr><th>Stage</th><th>Basis</th><th>Cost</th></tr>
+      <tr class="phase"><td colspan="3">Phase 1 — site works, the part you cannot skip</td></tr>
+      <tr><td>Clearing, silt removal, layout</td><td>1,434 sq ft</td><td>₹25,000</td></tr>
+      <tr><td>Earth filling under the house, 8 ft, compacted in layers</td><td>~355 cu m</td><td>₹2,05,000</td></tr>
+      <tr><td>Excavation, PCC, 16 pad footings</td><td>base &minus;4'-6"</td><td>₹1,35,000</td></tr>
+      <tr><td>Retaining plinth walls and damp proof course</td><td>146 rft</td><td>₹2,15,000</td></tr>
+      <tr class="tot"><td>Site and plinth</td><td></td><td>₹5,80,000</td></tr>
+      <tr class="phase"><td colspan="3">Phase 1 — ground floor</td></tr>
+      <tr><td>Columns and plinth beams, steel sized for G+2</td><td>16 nos</td><td>₹1,45,000</td></tr>
+      <tr><td>Brickwork, 9 in outer and 4.5 in inner</td><td>&mdash;</td><td>₹2,10,000</td></tr>
+      <tr><td>Roof slab over ground floor with staircase</td><td>1,020 sq ft</td><td>₹3,60,000</td></tr>
+      <tr><td>Septic tank and soak pit, raised above flood line</td><td>2,000 L</td><td>₹75,000</td></tr>
+      <tr class="tot"><td>Ground floor shell</td><td></td><td>₹7,90,000</td></tr>
+      <tr class="phase"><td colspan="3">Phase 1 — finish only what gets lived in</td></tr>
+      <tr><td>Master bedroom with toilet, kitchen, dining: plaster, floor, doors, windows, wiring, plumbing, paint</td><td>~340 sq ft</td><td>₹3,60,000</td></tr>
+      <tr><td>Other rooms shuttered, one light point each</td><td>~650 sq ft</td><td>₹95,000</td></tr>
+      <tr class="tot"><td>Phase 1 total</td><td></td><td>₹18,25,000</td></tr>
+      <tr class="phase"><td colspan="3">Phase 2 — first floor, about 15 months on</td></tr>
+      <tr><td>Columns, slab, brickwork, stair cover, full finishing</td><td>997 sq ft</td><td>₹12,40,000</td></tr>
+      <tr><td>Facade: chajja bands, brick jaali, railings, texture paint</td><td>&mdash;</td><td>₹1,60,000</td></tr>
+      <tr><td>Boundary wall, gate, garden kerb</td><td>&mdash;</td><td>₹1,70,000</td></tr>
+      <tr class="tot"><td>Whole house, both phases</td><td></td><td>₹33,95,000</td></tr>
+    </table>
+    <p class="note"><b>Read this before anything else.</b> You said ₹16&ndash;17 lakh for the whole house and ₹10&ndash;12 lakh for neev plus ground floor. A 997 sq ft floor cannot be built and finished for that here, and I would rather say so now than let you find out at slab level. Site works alone take ₹5.8 lakh before one wall stands, because lifting a plot that floods to road level is expensive and invisible.</p>
+    <p class="note"><b>Three ways to make ₹12 lakh work for phase 1.</b> One: build the full 997 sq ft frame and slab but finish only the master bedroom, kitchen and one toilet — about ₹13.7 lakh. Two: shrink the ground floor to roughly 700 sq ft by pushing the bachelor bedroom and utility into phase 2, about ₹11.8 lakh, with columns still cast for the full plan. Three: keep the plan and stretch phase 1 across two working seasons. Open the Excel tracker and replace my rates with your own quotations &mdash; every total recalculates and the summary sheet shows the gap against your budget.</p>
+    <p class="note"><b>Before you dig.</b> One trial pit, 6 ft deep, south-west corner, in dry weather. If water seeps in above 6 ft, pad footings will not serve and this becomes a raft. A day of labour decides a third of the structural cost.</p>
+  </div>
+</div>
+<div id="loading">Building the model&hellip;</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* Feet.  X: 0 road (east) -> 37.5 rear (west)
+          Z: 0 nala (south) -> 38.25 existing house (north)
+          Y: 0 = plot surface today                                   */
+var G0=0, ROAD=7, PL=8.5, LIN=15.75, GFC=18.5, FF=19, FFC=29, ROOF=29.5, PAR=32.8;
+var FTB=-4.5, FTT=-3.25;
+var PX0=0, PX1=37.5, PZ0=0, PZ1=38.25;
+var BX0=6, BX1=34.5, BZ0=3, BZ1=38;
+var Xb=19, Xc=23, Xd=28;
+var Zb=13, Zc=17, Zd=22, Ze=27, Zf=33, Zg=38;
+var COLX=[6,19,23,34.5], COLZ=[3,13,27,38];
+var EXT=0.75, INT=0.375, H=10;
+
+var scene,camera,renderer,root;
+var groups={}, labs={};
+var mode='orbit', rainOn=false, cur=0;
+var orbit={tx:18,ty:9,tz:19,r:96,th:-0.6,ph:1.04};
+var pov={x:-5,y:PL+5.5,z:32,yaw:-Math.PI/2,pitch:-0.05,h:PL};
+
+function M(c,o){var p={color:c};if(o)for(var k in o)p[k]=o[k];return new THREE.MeshLambertMaterial(p);}
+var mat={
+  soil:M(0x6b5a44), fill:M(0x8a6f4e,{transparent:true,opacity:.5}),
+  road:M(0x5c6577), pcc:M(0x7d8390), footing:M(0x9aa3b4),
+  column:M(0xb14a2a), beam:M(0xd06a3f),
+  slabT:M(0xd7dfef,{transparent:true,opacity:.5,side:THREE.DoubleSide}), slab:M(0xd0d7e4),
+  plaster:M(0xb9b3aa), band:M(0xe6e2db), brick:M(0xa85a3c), brickIn:M(0xd8c3b2),
+  retain:M(0x8d8577), nala:M(0x2c3a4e),
+  water:M(0x3fa9a0,{transparent:true,opacity:.4,side:THREE.DoubleSide}),
+  grass:M(0x51694a), lawn:M(0x5f8f56), leaf:M(0x4f9b57), bloom:M(0xd4657f),
+  nb:M(0x8f97a6), own:M(0xa8593c), stair:M(0xc7cedd), rail:M(0x3a3f47),
+  frame:M(0x2f353d), glass:M(0x7fb4cf,{transparent:true,opacity:.35,side:THREE.DoubleSide}),
+  tile:M(0x9fb0a8), sky:M(0xa9d8e8,{transparent:true,opacity:.3,side:THREE.DoubleSide})
+};
+
+function box(g,x0,z0,x1,z1,y0,y1,m){
+  var w=Math.abs(x1-x0), d=Math.abs(z1-z0), h=Math.abs(y1-y0);
+  if(w<0.01||d<0.01||h<0.01) return null;
+  var s=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);
+  s.position.set((x0+x1)/2,(y0+y1)/2,(z0+z1)/2); g.add(s); return s;
+}
+function edges(g,x0,z0,x1,z1,y0,y1,col){
+  var w=Math.abs(x1-x0),d=Math.abs(z1-z0),h=Math.abs(y1-y0);
+  if(w<0.01||d<0.01||h<0.01) return;
+  var e=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(w,h,d)),
+        new THREE.LineBasicMaterial({color:col||0x24365a}));
+  e.position.set((x0+x1)/2,(y0+y1)/2,(z0+z1)/2); g.add(e);
+}
+function slab(g,x0,z0,x1,z1,y,t,m){ box(g,x0,z0,x1,z1,y-t,y,m||mat.slabT); }
+
+function wall(g,axis,at,from,to,fy,ht,t,m,op){
+  var lo=Math.min(from,to), hi=Math.max(from,to), cur=lo;
+  op=(op||[]).slice().sort(function(a,b){return a.s-b.s;});
+  function seg(s,e,y0,y1,mm){
+    if(e-s<0.02||y1-y0<0.02) return;
+    if(axis==='x') box(g,s,at-t/2,e,at+t/2,fy+y0,fy+y1,mm||m);
+    else           box(g,at-t/2,s,at+t/2,e,fy+y0,fy+y1,mm||m);
+  }
+  for(var i=0;i<op.length;i++){
+    var o=op[i], s=Math.max(lo,o.s), e=Math.min(hi,o.e);
+    if(e<=s) continue;
+    seg(cur,s,0,ht); seg(s,e,0,o.y0); seg(s,e,o.y1,ht);
+    if(o.y0>0.5){
+      var fr=0.22;
+      seg(s,e,o.y0,o.y0+fr,mat.frame); seg(s,e,o.y1-fr,o.y1,mat.frame);
+      seg(s,s+fr,o.y0,o.y1,mat.frame); seg(e-fr,e,o.y0,o.y1,mat.frame);
+      if(axis==='x') box(g,s+fr,at-0.06,e-fr,at+0.06,fy+o.y0+fr,fy+o.y1-fr,mat.glass);
+      else           box(g,at-0.06,s+fr,at+0.06,e-fr,fy+o.y0+fr,fy+o.y1-fr,mat.glass);
+    }
+    cur=e;
+  }
+  seg(cur,hi,0,ht);
+}
+
+function label(g,txt,x,y,z,sc,col){
+  sc=sc||3;
+  var c=document.createElement('canvas'); c.width=512; c.height=112;
+  var q=c.getContext('2d');
+  q.fillStyle='rgba(7,15,33,0.82)'; q.beginPath();
+  if(q.roundRect) q.roundRect(4,10,504,92,16); else q.rect(4,10,504,92);
+  q.fill();
+  q.font='600 42px Inter, Segoe UI, sans-serif';
+  q.fillStyle=col||'#e8eefc'; q.textAlign='center'; q.textBaseline='middle';
+  q.fillText(txt,256,58);
+  var sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),
+        depthTest:false,transparent:true}));
+  sp.position.set(x,y,z); sp.scale.set(sc*3.2,sc*0.7,1); sp.renderOrder=990;
+  g.add(sp); return sp;
+}
+
+function buildSite(){
+  var g=groups.site=new THREE.Group(); root.add(g);
+  box(g,PX0-26,PZ0-30,PX1+26,PZ1+32,-7,G0,mat.soil);
+  box(g,PX0,PZ0-6,PX1,PZ1,G0,G0+0.06,mat.grass);
+  box(g,-8,PZ0-26,PX0,PZ1+26,G0,ROAD,mat.road);
+  label(g,"Rasta 2.44 m",-4.5,ROAD+3,20,2.8,'#9aa7bd');
+  box(g,PX0-14,PZ0-13,PX1+12,PZ0-6,G0-7,ROAD,mat.nala);
+  box(g,PX0-14,PZ0-13,PX1+12,PZ0-6,G0-7,G0-2.5,mat.water);
+  label(g,"Nala, south",17,ROAD+2.5,-9.5,3.4,'#5ec9c0');
+  box(g,PX0,PZ1,PX1,PZ1+26,ROAD-1,ROAD+21,mat.own);
+  edges(g,PX0,PZ1,PX1,PZ1+26,ROAD-1,ROAD+21,0x6b3a26);
+  label(g,"Your house, G+1",18,ROAD+24,PZ1+12,4.2,'#e08a5f');
+  box(g,PX1+2.5,PZ0-4,PX1+24,PZ1+6,ROAD-1,ROAD+19,mat.nb);
+  label(g,"Seller's land, west",PX1+13,ROAD+21,19,3.8,'#8ea3c9');
+  edges(g,PX0,PZ0,PX1,PZ1,G0,G0+0.12,0xe8b93b);
+  label(g,"37'-6\"",PX1/2,G0+2.4,PZ0+1,2.6,'#e8b93b');
+  label(g,"38'-3\"",PX0+1.6,G0+2.4,PZ1/2,2.6,'#e8b93b');
+}
+function buildWater(){
+  var g=groups.water=new THREE.Group(); root.add(g); g.visible=false;
+  box(g,PX0-14,PZ0-13,PX1+2,PZ1,G0,ROAD,mat.water);
+  label(g,"Monsoon water, 3-5 days",16,ROAD+4,9,5.2,'#7fe3da');
+}
+
+var RX0=BX0-0.5, RX1=BX1+0.5, RZ0=BZ0-0.5, RZ1=BZ1+0.4;
+function buildFoundation(){
+  var g=groups.found=new THREE.Group(); root.add(g);
+  for(var i=0;i<COLX.length;i++) for(var j=0;j<COLZ.length;j++){
+    var x=COLX[i], z=COLZ[j];
+    box(g,x-2.4,z-2.4,x+2.4,z+2.4,FTB-0.4,FTB,mat.pcc);
+    box(g,x-2.1,z-2.1,x+2.1,z+2.1,FTB,FTT,mat.footing);
+    edges(g,x-2.1,z-2.1,x+2.1,z+2.1,FTB,FTT,0x33507f);
+    box(g,x-0.5,z-0.6,x+0.5,z+0.6,FTT,PL-0.5,mat.column);
+  }
+  box(g,RX0,RZ0,RX1,RZ0+0.75,FTT,PL-0.5,mat.retain);
+  box(g,RX0,RZ1-0.75,RX1,RZ1,FTT,PL-0.5,mat.retain);
+  box(g,RX0,RZ0,RX0+0.75,RZ1,FTT,PL-0.5,mat.retain);
+  box(g,RX1-0.75,RZ0,RX1,RZ1,FTT,PL-0.5,mat.retain);
+  box(g,RX0+0.75,RZ0+0.75,RX1-0.75,RZ1-0.75,FTT,PL-0.8,mat.fill);
+  box(g,RX0,RZ0,RX1,RZ1,PL-0.8,PL-0.5,mat.beam);
+  label(g,"Compacted earth fill, 8 ft",20,PL-3.5,20,5.2,'#e0c199');
+  label(g,"Footing base  -4'-6\"",8,FTB-2,BZ0-4,4.2,'#8ea3c9');
+  label(g,"Damp proof course",BX1+4,PL-0.4,BZ0-3,4.2,'#e08a5f');
+}
+function buildPlinth(){
+  var g=groups.plinth=new THREE.Group(); root.add(g);
+  box(g,RX0,RZ0,RX1,RZ1,G0-0.2,PL-0.5,mat.retain);
+  box(g,PX0,BZ0-0.5,BX0,BZ1+0.4,G0-0.2,PL-0.5,mat.retain);
+  edges(g,PX0,RZ0,RX1,RZ1,G0,PL-0.5,0x5d5648);
+  for(var i=0;i<4;i++) box(g,PX0-2.6+i*0.7,20.5,PX0+0.3,27.5,G0,ROAD+0.42*(i+1),mat.retain);
+}
+
+function deck(g,y,t,m){
+  slab(g,BX0,BZ0,Xb,BZ1,y,t,m);
+  slab(g,Xb,8,BX1,BZ1,y,t,m);
+  slab(g,Xc,BZ0,BX1,8,y,t,m);
+}
+function buildStructure(){
+  var g=groups.struct=new THREE.Group(); root.add(g);
+  for(var i=0;i<COLX.length;i++) for(var j=0;j<COLZ.length;j++){
+    var x=COLX[i], z=COLZ[j];
+    box(g,x-0.5,z-0.6,x+0.5,z+0.6,FTT,PAR-1,mat.column);
+    edges(g,x-0.5,z-0.6,x+0.5,z+0.6,FTT,PAR-1,0x7a2f12);
+  }
+  box(g,0.25,26.6,1.25,27.8,PL-1,FF,mat.column);
+  box(g,0.25,36.6,1.25,37.8,PL-1,FF,mat.column);
+  var lv=[PL-0.6,GFC,FFC];
+  for(var L=0;L<lv.length;L++){
+    var y=lv[L];
+    for(var a=0;a<COLZ.length;a++) box(g,BX0,COLZ[a]-0.45,BX1,COLZ[a]+0.45,y-0.9,y,mat.beam);
+    for(var b=0;b<COLX.length;b++) box(g,COLX[b]-0.45,BZ0,COLX[b]+0.45,BZ1,y-0.9,y,mat.beam);
+  }
+  deck(g,FF,0.45,mat.slabT); deck(g,ROOF,0.45,mat.slabT);
+  buildStair(g,PL,FF); buildStair(g,FF,ROOF);
+  label(g,"Plinth beam  +7'-11\"",BX1+4,PL,BZ1+2,4.4,'#e08a5f');
+  label(g,"16 columns, 9x12 in, steel sized for G+2",20,PAR+3,20,7.4,'#e08a5f');
+  label(g,"Longest span 14 ft",20,PAR-3,27,4.2,'#8ea3c9');
+}
+function buildStair(g,fromY,toY){
+  var n=18, rise=(toY-fromY)/n, tr=0.75, i, y;
+  for(i=0;i<9;i++){ y=fromY+rise*(i+1);
+    box(g,19.5,28.5+i*tr,23,28.5+(i+1)*tr,y-rise,y,mat.stair); }
+  box(g,19.5,35.25,27,37.5,fromY+rise*9-0.35,fromY+rise*9,mat.stair);
+  for(i=0;i<9;i++){ y=fromY+rise*(9+i+1);
+    box(g,23.5,35.25-(i+1)*tr,27,35.25-i*tr,y-rise,y,mat.stair); }
+}
+
+function d(s,e){return {s:s,e:e,y0:0,y1:7};}
+function w(s,e){return {s:s,e:e,y0:3,y1:7};}
+function wl(s,e){return {s:s,e:e,y0:1.5,y1:7};}
+function wh(s,e){return {s:s,e:e,y0:4.5,y1:7};}
+function vent(s,e){return {s:s,e:e,y0:7.6,y1:9};}
+
+function buildGround(){
+  var g=groups.gf=new THREE.Group(); root.add(g);
+  var fy=PL;
+  box(g,BX0,BZ0,BX1,BZ1,PL-0.5,PL,mat.slab);
+  wall(g,'z',BX0,BZ0,BZ1,fy,H,EXT,mat.plaster,
+       [w(5,9), wl(15,19), d(23,26.5), d(30,33.5), wl(35,37.5)]);
+  wall(g,'x',BZ0,BX0,BX1,fy,H,EXT,mat.plaster,[w(9,13), w(24,28), wh(31,33.5)]);
+  wall(g,'x',BZ1,BX0,BX1,fy,H,EXT,mat.plaster,[vent(10,14), vent(21,25)]);
+  wall(g,'z',BX1,BZ0,BZ1,fy,H,EXT,mat.plaster,
+       [wh(4,6.5), w(9,13.5), w(19,23), w(24.5,27), wh(28.5,31), d(34.5,37)]);
+  wall(g,'z',Xb,BZ0,8,fy,H,INT,mat.brickIn,[w(4.5,7)]);
+  wall(g,'z',Xb,8,Zd,fy,H,INT,mat.brickIn,[]);
+  wall(g,'z',Xb,Zd,Ze,fy,H,INT,mat.brickIn,[d(23,26)]);
+  wall(g,'z',Xb,Ze,Zg,fy,H,INT,mat.brickIn,[d(30,33)]);
+  wall(g,'z',Xc,BZ0,8,fy,H,INT,mat.brickIn,[w(4.5,7)]);
+  wall(g,'z',Xc,8,Zc,fy,H,INT,mat.brickIn,[d(11,14)]);
+  wall(g,'z',Xc,Zc,Ze,fy,H,INT,mat.brickIn,[d(19,22)]);
+  wall(g,'x',Zb,BX0,Xb,fy,H,INT,mat.brickIn,[d(8,11.5)]);
+  wall(g,'x',Zd,BX0,Xb,fy,H,INT,mat.brickIn,[d(8,11.5)]);
+  wall(g,'x',Ze,BX0,Xb,fy,H,INT,mat.brickIn,[d(8,11.5)]);
+  wall(g,'x',Zc,Xc,BX1,fy,H,INT,mat.brickIn,[]);
+  wall(g,'x',Ze,Xc,BX1,fy,H,INT,mat.brickIn,[]);
+  wall(g,'z',Xd,Ze,Zg,fy,H,INT,mat.brickIn,[d(28.5,31),d(34.5,37)]);
+  wall(g,'x',Zf,Xd,BX1,fy,H,INT,mat.brickIn,[]);
+  wall(g,'z',29.5,BZ0,7.5,fy,H,INT,mat.brickIn,[]);
+  wall(g,'x',7.5,29.5,BX1,fy,H,INT,mat.brickIn,[d(31,33.5)]);
+  box(g,29.5,BZ0,BX1,7.5,fy,fy+0.08,mat.tile);
+  box(g,Xd,Ze,BX1,Zf,fy,fy+0.08,mat.tile);
+  box(g,Xb,BZ0,Xc,8,fy,fy+0.1,mat.tile);
+  buildStair(g,PL,FF); buildFacadeGF(g); buildGarden(g);
+  var L=labs.gf=new THREE.Group(); g.add(L); var y=fy+8.4;
+  label(L,"Kitchen 13x10",12.5,y,8,4.4);
+  label(L,"Dining 13x9",12.5,y,17.5,4);
+  label(L,"Foyer",12.5,y,24.5,2.6);
+  label(L,"Living 13x11",12.5,y,32.5,4.2);
+  label(L,"Light court",21,y,5.5,3.2,'#5ec9c0');
+  label(L,"Passage",21,y,17,2.8);
+  label(L,"Bedroom, couple 1  138 sq ft",27,y,12,6.4);
+  label(L,"Toilet",32,y,5.2,2.2);
+  label(L,"Bedroom, bachelor  115 sq ft",28.7,y,22,6.2);
+  label(L,"Stair hall",22,y,31,3.0);
+  label(L,"Bath",31.2,y,30,2.2);
+  label(L,"Utility",31.2,y,35.5,2.4);
+  label(L,"Porch, 2 bikes",3,y-1,32.5,3.8,'#e8b93b');
+  label(L,"Flower garden",3,y-2.5,12,3.8,'#7fd48a');
+}
+
+function buildFirst(){
+  var g=groups.ff=new THREE.Group(); root.add(g);
+  var fy=FF;
+  box(g,BX0,BZ0,Xb,BZ1,FF-0.45,FF,mat.slab);
+  box(g,Xb,8,BX1,BZ1,FF-0.45,FF,mat.slab);
+  box(g,Xc,BZ0,BX1,8,FF-0.45,FF,mat.slab);
+  wall(g,'z',BX0,BZ0,BZ1,fy,H,EXT,mat.plaster,
+       [w(5,9), wl(15,19), w(23,26), d(30,33.5), wl(35,37.5)]);
+  wall(g,'x',BZ0,BX0,BX1,fy,H,EXT,mat.plaster,[w(9,13), w(24,28), wh(31,33.5)]);
+  wall(g,'x',BZ1,BX0,BX1,fy,H,EXT,mat.plaster,[vent(10,14), vent(21,25)]);
+  wall(g,'z',BX1,BZ0,Zf,fy,H,EXT,mat.plaster,
+       [wh(4,6.5), w(9,13.5), w(19,23), w(24.5,27), wh(28.5,31)]);
+  wall(g,'z',Xb,BZ0,8,fy,H,INT,mat.brickIn,[w(4.5,7)]);
+  wall(g,'z',Xb,8,Zd,fy,H,INT,mat.brickIn,[]);
+  wall(g,'z',Xb,Zd,Ze,fy,H,INT,mat.brickIn,[d(23,26)]);
+  wall(g,'z',Xb,Ze,Zg,fy,H,INT,mat.brickIn,[d(30,33)]);
+  wall(g,'z',Xc,BZ0,8,fy,H,INT,mat.brickIn,[w(4.5,7)]);
+  wall(g,'z',Xc,8,Zc,fy,H,INT,mat.brickIn,[d(11,14)]);
+  wall(g,'z',Xc,Zc,Ze,fy,H,INT,mat.brickIn,[d(19,22)]);
+  wall(g,'x',11,BX0,Xb,fy,H,INT,mat.brickIn,[d(8,11.5)]);
+  wall(g,'x',Zd,BX0,Xb,fy,H,INT,mat.brickIn,[d(8,11.5)]);
+  wall(g,'x',Ze,BX0,Xb,fy,H,INT,mat.brickIn,[d(8,11.5)]);
+  wall(g,'x',Zc,Xc,BX1,fy,H,INT,mat.brickIn,[]);
+  wall(g,'x',Ze,Xc,BX1,fy,H,INT,mat.brickIn,[]);
+  wall(g,'z',Xd,Ze,Zf,fy,H,INT,mat.brickIn,[d(28.5,31)]);
+  wall(g,'x',Zf,Xd,BX1,fy,H,INT,mat.brickIn,[d(29.5,32.5)]);
+  wall(g,'z',29.5,BZ0,7.5,fy,H,INT,mat.brickIn,[]);
+  wall(g,'x',7.5,29.5,BX1,fy,H,INT,mat.brickIn,[d(31,33.5)]);
+  box(g,29.5,BZ0,BX1,7.5,fy,fy+0.08,mat.tile);
+  box(g,Xd,Ze,BX1,Zf,fy,fy+0.08,mat.tile);
+  box(g,Xb,BZ0,Xc,8,fy,fy+0.1,mat.tile);
+  box(g,Xd,Zf,BX1,BZ1,fy,fy+0.1,mat.tile);
+  box(g,PX0+0.2,Ze,BX0,BZ1,fy,fy+0.15,mat.tile);
+  buildStair(g,FF,ROOF); buildFacadeFF(g);
+  slab(g,BX0,BZ0,Xb,BZ1,ROOF,0.45,mat.slab);
+  slab(g,Xc,BZ0,BX1,8,ROOF,0.45,mat.slab);
+  slab(g,Xb,8,BX1,Ze,ROOF,0.45,mat.slab);
+  slab(g,Xb,Ze,Xd,32,ROOF,0.45,mat.slab);
+  slab(g,Xb,35.5,Xd,BZ1,ROOF,0.45,mat.slab);
+  slab(g,Xd,Ze,BX1,Zf,ROOF,0.45,mat.slab);
+  box(g,Xb,32,Xd,35.5,ROOF-0.1,ROOF+0.1,mat.sky);
+  box(g,Xb,32,Xd,32.3,ROOF,ROOF+1.4,mat.frame);
+  box(g,Xb,35.2,Xd,35.5,ROOF,ROOF+1.4,mat.frame);
+  var L=labs.ff=new THREE.Group(); g.add(L); var y=fy+8.4;
+  label(L,"Kitchen 2",12.5,y,7,3.0);
+  label(L,"Family room 13x11",12.5,y,16.5,5.2);
+  label(L,"Study / pooja",12.5,y,24.5,3.6);
+  label(L,"Bedroom, son  143 sq ft",12.5,y,32.5,5.8);
+  label(L,"Court open below",21,y,5.5,3.6,'#5ec9c0');
+  label(L,"Passage",21,y,17,2.8);
+  label(L,"Bedroom, couple 2  138 sq ft",27,y,12,6.4);
+  label(L,"Toilet",32,y,5.2,2.2);
+  label(L,"Bedroom, daughter  115 sq ft",28.7,y,22,6.2);
+  label(L,"Stair + skylight",22,y,31,4.2);
+  label(L,"Bath",31.2,y,30,2.2);
+  label(L,"Open terrace",31.2,y,35.5,3.4,'#e8b93b');
+  label(L,"Balcony",3,y,32.5,2.6);
+}
+
+function buildFacadeGF(g){
+  box(g,PX0-0.4,BZ0-0.5,PX0+0.3,20.5,PL-0.5,PL+4,mat.plaster);
+  box(g,PX0-0.4,27.5,PX0+0.3,BZ1+0.4,PL-0.5,PL+4,mat.plaster);
+  box(g,PX0-0.5,BZ0-0.5,PX0+0.4,BZ0+0.6,PL-0.5,PL+7.5,mat.brick);
+  for(var z=BZ0+0.4; z<10.2; z+=0.72)
+    for(var y=PL+4.2; y<PL+13.6; y+=0.72)
+      box(g,PX0-0.35,z,PX0+0.25,z+0.5,y,y+0.5,mat.brick);
+  box(g,PX0-0.5,BZ0-0.5,PX0+0.4,10.6,PL+13.6,PL+14.4,mat.band);
+  box(g,BX0-1.6,BZ0-0.4,BX0,BZ1+0.4,PL+7.25,PL+7.6,mat.band);
+  box(g,BX0-0.4,BZ0-1.5,BX1+0.4,BZ0,PL+7.25,PL+7.6,mat.band);
+  box(g,BX0-0.4,BZ1,BX1+0.4,BZ1+1.2,PL+7.25,PL+7.6,mat.band);
+  box(g,BX1,BZ0-0.4,BX1+1.5,Zf,PL+7.25,PL+7.6,mat.band);
+}
+function buildFacadeFF(g){
+  var fy=FF, z, x;
+  box(g,PX0+0.2,Ze,BX0,BZ1,fy-0.45,fy,mat.slab);
+  for(z=Ze+0.3; z<BZ1; z+=0.5) box(g,PX0+0.25,z,PX0+0.42,z+0.13,fy+0.1,fy+3.3,mat.rail);
+  box(g,PX0+0.15,Ze,PX0+0.5,BZ1,fy+3.3,fy+3.55,mat.rail);
+  box(g,PX0+0.15,Ze,PX0+0.5,BZ1,fy+0.1,fy+0.35,mat.rail);
+  box(g,PX0,Ze-0.3,BX0,BZ1+0.3,fy+9.9,fy+10.4,mat.band);
+  box(g,BX0-1.4,BZ0-0.4,BX0,Ze,fy+7.25,fy+7.6,mat.band);
+  box(g,BX0-0.4,BZ0-1.4,BX1+0.4,BZ0,fy+7.25,fy+7.6,mat.band);
+  box(g,BX1,BZ0-0.4,BX1+1.4,Zf,fy+7.25,fy+7.6,mat.band);
+  box(g,BX0-0.5,BZ0-0.4,BX0,BZ1+0.4,ROOF,PAR,mat.plaster);
+  box(g,BX0-0.5,BZ0-0.4,BX1+0.4,BZ0,ROOF,PAR,mat.plaster);
+  box(g,BX1,BZ0-0.4,BX1+0.4,Zf,ROOF,PAR,mat.plaster);
+  box(g,BX0-0.6,BZ0-0.5,BX0,10.6,ROOF,PAR+1.6,mat.brick);
+  box(g,BX0-0.7,BZ0-0.6,BX0+0.1,10.7,PAR+1.6,PAR+2,mat.band);
+  for(x=Xd+0.6; x<BX1; x+=1.1) box(g,x,Zf+0.3,x+0.25,BZ1-0.3,ROOF+0.2,ROOF+0.55,mat.rail);
+  box(g,Xd+0.3,Zf+0.2,BX1-0.2,Zf+0.5,ROOF+0.5,ROOF+0.9,mat.rail);
+  box(g,Xd+0.3,BZ1-0.5,BX1-0.2,BZ1-0.2,ROOF+0.5,ROOF+0.9,mat.rail);
+  for(z=Zf+0.6; z<BZ1; z+=0.5) box(g,Xd+0.2,z,BX1-0.2,z+0.16,ROOF+0.9,ROOF+1.05,mat.rail);
+}
+
+function buildGarden(g){
+  box(g,PX0+0.4,BZ0,BX0-0.6,20.2,PL-0.5,PL-0.15,mat.lawn);
+  box(g,BX0-0.9,BZ0,BX0-0.6,20.2,PL-0.5,PL+0.35,mat.band);
+  box(g,PX0+0.4,20.2,BX0-0.6,20.5,PL-0.5,PL+0.35,mat.band);
+  var pts=[[1.6,5.2,0.9],[3.6,7.4,1.2],[1.8,10.4,1.0],[4.0,13.2,1.3],
+           [1.7,15.8,0.95],[3.8,18.4,1.1],[2.6,8.9,0.7],[2.4,12.0,0.75]];
+  for(var i=0;i<pts.length;i++){
+    var p=pts[i], r=p[2];
+    var st=new THREE.Mesh(new THREE.CylinderGeometry(0.09,0.12,r*0.9,6),mat.leaf);
+    st.position.set(p[0],PL-0.15+r*0.45,p[1]); g.add(st);
+    var bs=new THREE.Mesh(new THREE.SphereGeometry(r*0.55,10,8),mat.leaf);
+    bs.position.set(p[0],PL-0.15+r*1.0,p[1]); g.add(bs);
+    for(var k=0;k<3;k++){
+      var fl=new THREE.Mesh(new THREE.SphereGeometry(0.13,6,5),mat.bloom);
+      fl.position.set(p[0]+Math.cos(k*2.1)*r*0.45, PL-0.15+r*1.05+Math.sin(k*1.3)*0.22,
+                      p[1]+Math.sin(k*2.1)*r*0.45);
+      g.add(fl);
+    }
+  }
+  var pot=[[4.6,4.2],[4.6,19.0]];
+  for(var j=0;j<pot.length;j++){
+    var pc=new THREE.Mesh(new THREE.CylinderGeometry(0.55,0.42,1.1,10),mat.brick);
+    pc.position.set(pot[j][0],PL+0.05,pot[j][1]); g.add(pc);
+    var pl=new THREE.Mesh(new THREE.SphereGeometry(0.62,10,8),mat.leaf);
+    pl.position.set(pot[j][0],PL+1.0,pot[j][1]); g.add(pl);
+  }
+}
+
+var VIEWS=[
+ {k:'site',n:'Site and levels',s:'How the plot sits',
+  t:'The plot sits about 7 ft low',
+  b:'Road east, nala south with the government strip between, your G+1 house on the north. Water reaches road level and stands three to five days, so every level here is measured down from the road, never up from the plot.',
+  on:['site'],cam:{tx:18,ty:8,tz:18,r:100,th:-0.6,ph:1.06}},
+ {k:'found',n:'Neev',s:'Footings, fill, plinth',
+  t:'Foundation and the raised plinth',
+  b:'Sixteen pad footings 4 ft 6 in below the present surface on a PCC bed. Retaining walls hold 8 ft of compacted earth under the house footprint only, so you are not paying to lift all 160 gaj. Floor level lands at 8 ft 6 in, eighteen inches above the worst flood you have described.',
+  on:['site','found'],cam:{tx:20,ty:2,tz:20,r:76,th:-0.75,ph:1.14}},
+ {k:'struct',n:'Structure',s:'Columns, beams, slabs',
+  t:'Frame cast once, for three floors',
+  b:'Sixteen columns on an uneven grid that follows the walls rather than a tidy chessboard, so no column lands in the middle of a room. Longest span is 14 ft. Cast the footings and column steel for G+2 now even though you build G+1, because steel added later cannot reach the foundation.',
+  on:['site','struct'],cam:{tx:20,ty:14,tz:20,r:82,th:-0.85,ph:1.0}},
+ {k:'gf',n:'Ground floor',s:'Kitchen, dining, 2 bedrooms',
+  t:'Ground floor, 997 sq ft',
+  b:'Enter through the porch into a small foyer, which keeps the living room private from the front door. Kitchen and dining sit together along the garden side. Both toilets are pushed into the far north-west corner, as far from the dining table as the plot allows. Couple 1 gets the largest bedroom at 138 sq ft, the bachelor room is 115.',
+  on:['site','plinth','gf'],cam:{tx:19,ty:12,tz:20,r:70,th:-0.9,ph:0.62}},
+ {k:'ff',n:'First floor',s:'3 bedrooms, family room',
+  t:'First floor, phase 2',
+  b:'Three bedrooms of deliberately different sizes: the son gets the 143 sq ft front room, couple 2 the 138 sq ft master stacked over the one below, the daughter 115 sq ft. The second kitchen sits directly above the first so plumbing drops straight down, and the terrace over the utility waits for a future room.',
+  on:['site','plinth','gf','ff'],cam:{tx:19,ty:23,tz:20,r:70,th:-0.9,ph:0.62}},
+ {k:'all',n:'Finished house',s:'Facade, garden, terrace',
+  t:'How it will look from the road',
+  b:'One bold element and everything else quiet: a full-height brick jaali screen at the south end of the front, built from the same brick as the neighbourhood, giving the garden privacy from the road and throwing patterned shade through the day. Around it a continuous chajja band at lintel level draws one long horizontal line, and the balcony railing is plain dark flat bar.',
+  on:['site','plinth','gf','ff'],cam:{tx:14,ty:14,tz:20,r:76,th:-0.34,ph:1.16}},
+ {k:'pov',n:'Walk through',s:'Move around, in and out',
+  t:'Walk through it',
+  b:'Drag anywhere to look, joystick or W A S D to move, and switch floors with the buttons on the right. You start on the road facing the gate. Walk in past the garden, through the porch and foyer.',
+  on:['site','plinth','gf','ff'],pov:true}
+];
+
+function setView(i){
+  cur=i; var v=VIEWS[i], k, j;
+  for(k in groups) if(groups[k]) groups[k].visible=false;
+  for(j=0;j<v.on.length;j++) if(groups[v.on[j]]) groups[v.on[j]].visible=true;
+  if(groups.water) groups.water.visible=rainOn;
+  if(labs.gf) labs.gf.visible=(v.k==='gf');
+  if(labs.ff) labs.ff.visible=(v.k==='ff');
+  document.getElementById('infoTitle').textContent=v.t;
+  document.getElementById('infoBody').textContent=v.b;
+  var bs=document.querySelectorAll('.vbtn');
+  for(j=0;j<bs.length;j++) bs[j].classList.toggle('on',j===i);
+  if(v.pov){
+    mode='pov'; document.getElementById('povhud').classList.add('on');
+    pov.x=-5; pov.z=32; pov.yaw=-Math.PI/2; pov.pitch=-0.05; pov.h=PL; pov.y=PL+5.5;
+    setFloorBtn(PL);
+  } else {
+    mode='orbit'; document.getElementById('povhud').classList.remove('on');
+    if(v.cam) for(k in v.cam) orbit[k]=v.cam[k];
+  }
+}
+
+function applyCam(){
+  if(mode==='orbit'){
+    var x=orbit.tx+orbit.r*Math.sin(orbit.ph)*Math.cos(orbit.th);
+    var y=orbit.ty+orbit.r*Math.cos(orbit.ph);
+    var z=orbit.tz+orbit.r*Math.sin(orbit.ph)*Math.sin(orbit.th);
+    camera.position.set(x,Math.max(y,-3),z);
+    camera.up.set(0,1,0); camera.lookAt(orbit.tx,orbit.ty,orbit.tz);
+  } else {
+    camera.position.set(pov.x,pov.y,pov.z);
+    camera.rotation.set(0,0,0);
+    camera.rotateY(pov.yaw); camera.rotateX(pov.pitch);
+  }
+}
+var keys={}, joy={x:0,y:0,active:false};
+function step(dt){
+  if(mode!=='pov') return;
+  var sp=11*dt, fx=0, fz=0;
+  if(keys['w']||keys['arrowup'])    fz+=1;
+  if(keys['s']||keys['arrowdown'])  fz-=1;
+  if(keys['a']||keys['arrowleft'])  fx-=1;
+  if(keys['d']||keys['arrowright']) fx+=1;
+  fx+=joy.x; fz+=joy.y;
+  if(fx||fz){
+    var sy=Math.sin(pov.yaw), cy=Math.cos(pov.yaw);
+    pov.x += (-sy*fz + cy*fx)*sp;
+    pov.z += (-cy*fz - sy*fx)*sp;
+  }
+  pov.x=Math.max(-13,Math.min(PX1+7,pov.x));
+  pov.z=Math.max(PZ0-13,Math.min(PZ1+4,pov.z));
+  pov.y += (pov.h+5.5-pov.y)*Math.min(1,dt*6);
+}
+function setFloorBtn(h){
+  var bs=document.querySelectorAll('.fbtn');
+  for(var i=0;i<bs.length;i++) bs[i].classList.toggle('on',parseFloat(bs[i].dataset.h)===h);
+}
+function bindInput(el){
+  var down=false,lx=0,ly=0,pinch=0;
+  el.addEventListener('pointerdown',function(e){
+    down=true; lx=e.clientX; ly=e.clientY;
+    if(el.setPointerCapture) try{el.setPointerCapture(e.pointerId);}catch(err){}
+  });
+  el.addEventListener('pointermove',function(e){
+    if(!down) return;
+    var dx=e.clientX-lx, dy=e.clientY-ly; lx=e.clientX; ly=e.clientY;
+    if(mode==='orbit'){
+      orbit.th-=dx*0.006;
+      orbit.ph=Math.max(0.1,Math.min(1.52,orbit.ph-dy*0.006));
+    } else {
+      pov.yaw-=dx*0.004;
+      pov.pitch=Math.max(-1.2,Math.min(1.2,pov.pitch-dy*0.004));
+    }
+  });
+  window.addEventListener('pointerup',function(){down=false;});
+  window.addEventListener('pointercancel',function(){down=false;});
+  el.addEventListener('wheel',function(e){
+    e.preventDefault();
+    if(mode==='orbit') orbit.r=Math.max(12,Math.min(210,orbit.r*(1+(e.deltaY>0?1:-1)*0.09)));
+  },{passive:false});
+  el.addEventListener('touchstart',function(e){
+    if(e.touches.length===2)
+      pinch=Math.sqrt(Math.pow(e.touches[0].clientX-e.touches[1].clientX,2)+
+                      Math.pow(e.touches[0].clientY-e.touches[1].clientY,2));
+  },{passive:true});
+  el.addEventListener('touchmove',function(e){
+    if(e.touches.length===2&&mode==='orbit'){
+      var p=Math.sqrt(Math.pow(e.touches[0].clientX-e.touches[1].clientX,2)+
+                      Math.pow(e.touches[0].clientY-e.touches[1].clientY,2));
+      if(pinch>0) orbit.r=Math.max(12,Math.min(210,orbit.r*pinch/p));
+      pinch=p; e.preventDefault();
+    }
+  },{passive:false});
+  window.addEventListener('keydown',function(e){
+    if(e.key) keys[e.key.toLowerCase()]=true;
+    if(e.key>='1'&&e.key<='7'){ var n=parseInt(e.key,10)-1; if(VIEWS[n]) setView(n); }
+  });
+  window.addEventListener('keyup',function(e){ if(e.key) keys[e.key.toLowerCase()]=false; });
+  var st=document.getElementById('stick'), kn=document.getElementById('knob');
+  function jmove(e){
+    var r=st.getBoundingClientRect();
+    var dx=e.clientX-(r.left+r.width/2), dy=e.clientY-(r.top+r.height/2);
+    var m=Math.min(1,Math.sqrt(dx*dx+dy*dy)/(r.width/2)), a=Math.atan2(dy,dx);
+    joy.x=Math.cos(a)*m; joy.y=-Math.sin(a)*m;
+    kn.style.transform='translate('+(Math.cos(a)*m*r.width/2.7)+'px,'+
+                                    (Math.sin(a)*m*r.width/2.7)+'px)';
+  }
+  function jend(){ joy.x=0; joy.y=0; joy.active=false; kn.style.transform=''; }
+  st.addEventListener('pointerdown',function(e){
+    joy.active=true; jmove(e); e.stopPropagation();
+    if(st.setPointerCapture) try{st.setPointerCapture(e.pointerId);}catch(err){}
+  });
+  st.addEventListener('pointermove',function(e){ if(joy.active){jmove(e); e.stopPropagation();} });
+  st.addEventListener('pointerup',jend);
+  st.addEventListener('pointercancel',jend);
+  st.addEventListener('pointerleave',function(){ if(joy.active) jend(); });
+}
+
+function init(){
+  var host=document.getElementById('app');
+  scene=new THREE.Scene();
+  scene.background=new THREE.Color(0x070f21);
+  scene.fog=new THREE.Fog(0x070f21,140,340);
+  camera=new THREE.PerspectiveCamera(58,innerWidth/innerHeight,0.35,900);
+  renderer=new THREE.WebGLRenderer({antialias:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.setSize(innerWidth,innerHeight);
+  host.appendChild(renderer.domElement);
+  scene.add(new THREE.HemisphereLight(0xcfe0ff,0x2a3350,0.95));
+  var s1=new THREE.DirectionalLight(0xfff0dd,0.74); s1.position.set(-48,70,26); scene.add(s1);
+  var s2=new THREE.DirectionalLight(0x88aaff,0.3);  s2.position.set(56,34,-44); scene.add(s2);
+  root=new THREE.Group(); scene.add(root);
+  buildSite(); buildWater(); buildFoundation(); buildPlinth();
+  buildStructure(); buildGround(); buildFirst();
+  var rail=document.getElementById('rail');
+  for(var i=0;i<VIEWS.length;i++)(function(n){
+    var v=VIEWS[n], b=document.createElement('button');
+    b.className='vbtn';
+    b.innerHTML='<span class="vnum">'+(n+1)+'</span><span><b>'+v.n+'</b><small>'+v.s+'</small></span>';
+    b.onclick=function(){ setView(n); };
+    rail.appendChild(b);
+  })(i);
+  document.getElementById('btnRain').onclick=function(){
+    rainOn=!rainOn; this.classList.toggle('on',rainOn);
+    if(groups.water) groups.water.visible=rainOn;
+  };
+  document.getElementById('btnCost').onclick=function(){document.getElementById('sheet').classList.add('on');};
+  document.getElementById('closeSheet').onclick=function(){document.getElementById('sheet').classList.remove('on');};
+  document.getElementById('sheet').onclick=function(e){ if(e.target===this) this.classList.remove('on'); };
+  document.getElementById('btnHome').onclick=function(){ setView(cur); };
+  var fb=document.querySelectorAll('.fbtn');
+  for(var j=0;j<fb.length;j++)
+    fb[j].onclick=function(){ pov.h=parseFloat(this.dataset.h); setFloorBtn(pov.h); };
+  bindInput(renderer.domElement);
+  addEventListener('resize',function(){
+    camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix();
+    renderer.setSize(innerWidth,innerHeight);
+  });
+  setView(0);
+  document.getElementById('loading').style.display='none';
+  var last=performance.now();
+  (function loop(t){
+    requestAnimationFrame(loop);
+    var dt=Math.min(0.05,(t-last)/1000); last=t;
+    step(dt); applyCam(); renderer.render(scene,camera);
+  })(last);
+}
+if(window.THREE) init();
+else document.getElementById('loading').textContent=
+  'The 3D library did not load. Open this file once with an internet connection.';
+</script>
+</body>
+</html>
